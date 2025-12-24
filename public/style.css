@@ -1665,6 +1665,8 @@ textarea#message-input:focus {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .settings-header {
@@ -1689,6 +1691,7 @@ textarea#message-input:focus {
     gap: 32px;
     padding: 24px 40px;
     overflow-y: auto;
+    align-items: start;
 }
 
 /* Left Form Section */
@@ -1696,11 +1699,13 @@ textarea#message-input:focus {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-height: 0;
 }
 
 .profile-banner-edit {
     position: relative;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    flex-shrink: 0;
 }
 
 .banner-preview {
@@ -1939,6 +1944,9 @@ textarea#message-input:focus {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: sticky;
+    top: 0;
+    align-self: start;
 }
 
 .preview-label {

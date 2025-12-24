@@ -1404,7 +1404,7 @@ async function saveUserSettings() {
             bio: document.getElementById('settings-bio').value,
             custom_status: document.getElementById('settings-custom-status').value,
             custom_status_emoji: document.getElementById('settings-custom-status-emoji').value,
-            presence: document.getElementById('settings-presence').value,
+            presence: document.querySelector('input[name="presence"]:checked')?.value || 'online',
             social_links: {
                 spotify: document.getElementById('social-spotify').value,
                 steam: document.getElementById('social-steam').value,

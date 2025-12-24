@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Clone - Messagerie Privée</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Auth Container -->
+  <div id="auth-container" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" width="48" height="48">
+            <path fill="currentColor"
+              d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02z" />
+          </svg>
+        </div>
+        <h1 id="auth-title">Bon retour !</h1>
+        <p id="auth-subtitle">Nous sommes heureux de te revoir !</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">E-MAIL</label>
+          <input type="email" id="login-email" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">MOT DE PASSE</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="btn-primary">Connexion</button>
+        <p class="auth-switch">
+          Tu n'as pas de compte ? <a href="#" id="show-register">Créer un compte</a>
+        </p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form hidden">
+        <div class="form-group">
+          <label for="register-username">NOM D'UTILISATEUR</label>
+          <input type="text" id="register-username" minlength="3" maxlength="32" required>
+        </div>
+        <div class="form-group">
+          <label for="register-email">E-MAIL</label>
+          <input type="email" id="register-email" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">MOT DE PASSE</label>
+          <input type="password" id="register-password" minlength="6" required>
+        </div>
+        <button type="submit" class="btn-primary">Créer un compte</button>
+        <p class="auth-switch">
+          Tu as déjà un compte ? <a href="#" id="show-login">Se connecter</a>
+        </p>
+      </form>
+
+      <div id="auth-error" class="auth-error hidden"></div>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app-container" class="app-container hidden">
+    <!-- Servers Sidebar -->
+    <aside class="servers-sidebar">
+      <div class="server-icon home active" id="home-btn" title="Messages privés" onclick="showDMView()">
+        <svg viewBox="0 0 24 24" width="28" height="28">
+          <path fill="currentColor"
+            d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02z" />
+        </svg>
+      </div>
+      <div class="server-divider"></div>
+
+      <!-- Dynamic Server List -->
+      <div id="servers-list" class="servers-list">
+        <!-- Servers will be loaded here dynamically -->
+      </div>
+
+      <!-- Add Server Button -->
+      <div class="server-icon add-server" id="add-server-btn" title="Ajouter un serveur">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+      </div>
+
+      <!-- Discover Servers -->
+      <div class="server-icon discover" id="discover-btn" title="Découvrir des serveurs">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor"
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+        </svg>
+      </div>
+    </aside>
+
+    <!-- Conversations Sidebar -->
+    <aside class="conversations-sidebar">
+      <div class="sidebar-header">
+        <div class="search-container">
+          <input type="text" id="user-search" placeholder="Trouver ou démarrer une conversation">
+        </div>
+      </div>
+
+      <!-- Friends Section -->
+      <div class="sidebar-nav">
+        <div class="nav-item" id="nav-friends">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor"
+              d="M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.61c0-1.18.68-2.26 1.76-2.73 1.17-.52 2.61-.91 4.24-.91zM4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm1.13 1.1c-.37-.06-.74-.1-1.13-.1-.99 0-1.93.21-2.78.58C.48 14.9 0 15.62 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29zM20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4 3.43c0-.81-.48-1.53-1.22-1.85-.85-.37-1.79-.58-2.78-.58-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24v-1.57zM12 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z" />
+          </svg>
+          <span>Amis</span>
+          <span class="badge hidden" id="friend-request-badge">0</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Messages privés</h3>
+      </div>
+
+      <div id="conversations-list" class="conversations-list">
+        <!-- Conversations will be loaded here -->
+      </div>
+
+      <!-- User Panel -->
+      <div class="user-panel">
+        <div class="user-info" id="user-settings">
+          <div class="user-avatar" id="current-user-avatar">
+            <img src="" alt="">
+            <span class="status-indicator online"></span>
+          </div>
+          <div class="user-details">
+            <span class="username" id="current-username">Username</span>
+            <span class="status-text" id="current-status-text">En ligne</span>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn" id="logout-btn" title="Déconnexion">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor"
+                d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Server Channels Sidebar (hidden by default) -->
+    <aside class="conversations-sidebar server-sidebar hidden" id="server-sidebar">
+      <div class="sidebar-header" id="server-header">
+        <div class="server-header-content">
+          <h2 id="server-name">Serveur</h2>
+          <button class="icon-btn" onclick="toggleServerMenu()">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="channels-list" class="channels-list">
+        <!-- Channels will be loaded here -->
+      </div>
+
+      <!-- User Panel -->
+      <div class="user-panel">
+        <div class="user-info" id="user-settings-server">
+          <div class="user-avatar" id="current-user-avatar-server">
+            <img src="" alt="">
+            <span class="status-indicator online"></span>
+          </div>
+          <div class="user-details">
+            <span class="username" id="current-username-server">Username</span>
+            <span class="status-text" id="current-status-text-server">En ligne</span>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn" id="voice-mute-btn-mini" onclick="VoiceModule?.toggleMute()" title="Mute">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button class="icon-btn" id="voice-deafen-btn-mini" onclick="VoiceModule?.toggleDeafen()" title="Sourdine">
+            <i class="fas fa-headphones"></i>
+          </button>
+          <button class="icon-btn" onclick="openSettings()" title="Paramètres">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Chat Area -->
+    <main class="chat-area" id="dm-view">
+      <!-- No conversation selected -->
+      <div id="no-conversation" class="no-conversation">
+        <div class="no-conversation-content">
+          <svg viewBox="0 0 24 24" width="120" height="120">
+            <path fill="currentColor" opacity="0.3"
+              d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.17.33.26c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02z" />
+          </svg>
+          <h2>Bienvenue sur Discord Clone !</h2>
+          <p>Sélectionne une conversation ou recherche un utilisateur pour commencer.</p>
+        </div>
+      </div>
+
+      <!-- Friends Panel -->
+      <div id="friends-panel" class="friends-panel hidden">
+        <header class="friends-header">
+          <h2>Amis</h2>
+          <div class="friends-tabs">
+            <button class="friends-tab active" data-tab="all">Tous</button>
+            <button class="friends-tab" data-tab="online">En ligne</button>
+            <button class="friends-tab" data-tab="pending">En attente</button>
+            <button class="friends-tab" data-tab="blocked">Bloqués</button>
+            <button class="friends-tab add" data-tab="add">Ajouter un ami</button>
+          </div>
+        </header>
+        <div class="friends-content">
+          <div id="friends-list" class="friends-list"></div>
+          <div id="add-friend-form" class="add-friend-form hidden">
+            <div class="add-friend-header">
+              <h3>AJOUTER UN AMI</h3>
+              <p>Tu peux ajouter des amis grâce à leurs noms d'utilisateur.</p>
+            </div>
+            <div class="add-friend-input-container">
+              <input type="text" id="add-friend-username"
+                placeholder="Tu peux ajouter des amis grâce à leurs noms d'utilisateur.">
+              <button class="add-friend-btn" id="send-friend-request">Envoyer une demande d'ami</button>
+            </div>
+            <div class="add-friend-divider">
+              <span>ou utilise un lien d'amitié</span>
+            </div>
+            <div class="friend-link-container">
+              <input type="text" id="my-friend-link" readonly placeholder="Clique sur Générer pour obtenir ton lien">
+              <button class="link-btn" id="generate-friend-link">Générer</button>
+              <button class="link-btn copy" id="copy-friend-link">Copier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Conversation -->
+      <div id="active-conversation" class="active-conversation hidden">
+        <!-- Chat Header -->
+        <header class="chat-header">
+          <div class="chat-header-info">
+            <span class="at-symbol">@</span>
+            <span class="chat-username" id="chat-username">Username</span>
+            <span class="chat-status" id="chat-user-status"></span>
+          </div>
+          <div class="chat-header-actions">
+            <button class="icon-btn" id="search-messages-btn" title="Rechercher (Ctrl+F)">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+              </svg>
+            </button>
+            <button class="icon-btn" id="video-call-btn" title="Appel vidéo">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" />
+              </svg>
+            </button>
+            <button class="icon-btn" id="audio-call-btn" title="Appel audio">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
+              </svg>
+            </button>
+            <button class="icon-btn" id="group-settings-btn" title="Paramètres du groupe" style="display:none;">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Messages Container -->
+        <div class="messages-container" id="messages-container">
+          <div class="messages-start">
+            <div class="conversation-start-avatar" id="conv-start-avatar"></div>
+            <h3 id="conv-start-username">Username</h3>
+            <p>C'est le début de votre conversation avec <strong id="conv-start-name">Username</strong>.</p>
+          </div>
+          <div id="messages-list" class="messages-list">
+            <!-- Messages will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="typing-indicator hidden">
+          <span class="typing-user"></span> est en train d'écrire...
+        </div>
+
+        <!-- Reply Preview -->
+        <div id="reply-preview" class="reply-preview hidden">
+          <div class="reply-preview-content">
+            <span class="reply-to">Réponse à <strong id="reply-to-username"></strong></span>
+            <span class="reply-text" id="reply-to-text"></span>
+          </div>
+          <button class="reply-cancel" id="cancel-reply">&times;</button>
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input-container">
+          <div class="message-input-wrapper">
+            <button class="icon-btn attach-btn" id="attach-btn" title="Joindre un fichier">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+              </svg>
+            </button>
+            <input type="file" id="file-input" hidden accept="image/*,video/*,audio/*,.pdf,.zip">
+            <div class="message-input-inner">
+              <textarea id="message-input" placeholder="Envoyer un message à @Username" rows="1"></textarea>
+              <div id="mention-autocomplete" class="mention-autocomplete hidden"></div>
+            </div>
+            <button class="icon-btn voice-btn" id="voice-btn" title="Envoyer un message vocal">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
+              </svg>
+            </button>
+            <button class="icon-btn emoji-btn" title="Emoji">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Search Results Modal -->
+    <div id="search-modal" class="modal hidden">
+      <div class="modal-content search-modal">
+        <div class="modal-header">
+          <h3>Résultats de recherche</h3>
+          <button class="close-modal" id="close-search-modal">&times;</button>
+        </div>
+        <div id="search-results" class="search-results">
+          <!-- Search results will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Search Modal -->
+    <div id="message-search-modal" class="modal hidden">
+      <div class="modal-content message-search-modal">
+        <div class="modal-header">
+          <input type="text" id="message-search-input" placeholder="Rechercher dans la conversation...">
+          <button class="close-modal" id="close-message-search">&times;</button>
+        </div>
+        <div id="message-search-results" class="message-search-results">
+          <!-- Message search results will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- File Preview Modal -->
+    <div id="file-preview-modal" class="modal hidden">
+      <div class="modal-content file-preview-modal">
+        <div class="modal-header">
+          <h3>Aperçu du fichier</h3>
+          <button class="close-modal" id="close-file-modal">&times;</button>
+        </div>
+        <div id="file-preview-content" class="file-preview-content">
+          <!-- Preview will be shown here -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-upload">Annuler</button>
+          <button class="btn-primary" id="confirm-upload">Envoyer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="modal hidden">
+      <button class="close-viewer" id="close-image-viewer">&times;</button>
+      <img id="image-viewer-img" src="" alt="">
+    </div>
+
+    <!-- Voice Recording Modal -->
+    <div id="voice-recording-modal" class="modal hidden">
+      <div class="voice-recording-container">
+        <div class="voice-recording-header">
+          <div class="recording-pulse"></div>
+          <span class="recording-label">Enregistrement...</span>
+          <span class="recording-time" id="recording-time">0:00</span>
+        </div>
+
+        <div class="voice-waveform-container">
+          <div class="voice-waveform" id="voice-waveform">
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+          </div>
+        </div>
+
+        <div class="voice-recording-actions">
+          <button class="voice-action-btn cancel" id="cancel-voice" title="Annuler">
+            <i class="fas fa-trash"></i>
+            <span>Supprimer</span>
+          </button>
+          <button class="voice-action-btn send" id="send-voice" title="Envoyer">
+            <i class="fas fa-paper-plane"></i>
+            <span>Envoyer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incoming Call Modal -->
+    <div id="incoming-call-modal" class="modal hidden">
+      <div class="modal-content call-modal">
+        <div class="call-ui">
+          <div class="call-avatar" id="caller-avatar">?</div>
+          <h3 class="call-username" id="caller-username">Utilisateur</h3>
+          <p class="call-type" id="call-type-text">Appel entrant...</p>
+          <div class="call-actions">
+            <button class="call-btn reject" id="reject-call" title="Refuser">
+              <svg viewBox="0 0 24 24" width="32" height="32">
+                <path fill="currentColor"
+                  d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z" />
+              </svg>
+            </button>
+            <button class="call-btn accept" id="accept-call" title="Accepter">
+              <svg viewBox="0 0 24 24" width="32" height="32">
+                <path fill="currentColor"
+                  d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Call Modal -->
+    <div id="active-call-modal" class="modal hidden">
+      <div class="call-container">
+        <div class="call-info">
+          <div class="call-avatar-small" id="call-partner-avatar">?</div>
+          <span class="call-partner-name" id="call-partner-name">Utilisateur</span>
+          <span class="call-duration" id="call-duration">00:00</span>
+        </div>
+        <div class="call-videos" id="call-videos">
+          <div class="video-placeholder" id="video-placeholder">?</div>
+          <video id="remote-video" autoplay playsinline></video>
+          <video id="local-video" autoplay playsinline muted></video>
+          <div class="screen-share-indicator hidden" id="screen-share-indicator">
+            <i class="fas fa-desktop"></i>
+            <span>Partage d'écran en cours</span>
+          </div>
+        </div>
+        <div class="call-controls">
+          <button class="call-control-btn" id="toggle-mute" title="Micro">
+            <svg viewBox="0 0 24 24" width="24" height="24" id="mute-icon">
+              <path fill="currentColor"
+                d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
+            </svg>
+          </button>
+          <button class="call-control-btn" id="toggle-video" title="Vidéo">
+            <svg viewBox="0 0 24 24" width="24" height="24" id="video-icon">
+              <path fill="currentColor"
+                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" />
+            </svg>
+          </button>
+          <button class="call-control-btn" id="toggle-screen" title="Partage d'écran">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor"
+                d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h4v2h-4zm-6 0h4v2H5zm6-4h4v2h-4zm-6 0h4v2H5z" />
+            </svg>
+          </button>
+          <button class="call-control-btn end-call" id="end-call" title="Raccrocher">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor"
+                d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="create-group-modal" class="modal hidden">
+      <div class="modal-content create-group-modal">
+        <div class="modal-header">
+          <h3>Créer un groupe</h3>
+          <button class="close-modal" id="close-group-modal">&times;</button>
+        </div>
+        <div class="create-group-content">
+          <div class="form-group">
+            <label>NOM DU GROUPE</label>
+            <input type="text" id="group-name" placeholder="Mon super groupe">
+          </div>
+          <div class="form-group">
+            <label>AJOUTER DES AMIS</label>
+            <input type="text" id="group-members-search" placeholder="Rechercher des amis...">
+            <div id="group-members-results" class="group-members-results"></div>
+          </div>
+          <div class="selected-members">
+            <label>MEMBRES SÉLECTIONNÉS (<span id="selected-count">0</span>/9)</label>
+            <div id="selected-members-list" class="selected-members-list"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-group">Annuler</button>
+          <button class="btn-primary" id="confirm-group">Créer le groupe</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forward Message Modal -->
+    <div id="forward-modal" class="modal hidden">
+      <div class="modal-content forward-modal">
+        <div class="modal-header">
+          <h3>Transférer le message</h3>
+          <button class="close-modal" id="close-forward-modal">&times;</button>
+        </div>
+        <div class="forward-content">
+          <div class="forward-preview" id="forward-preview"></div>
+          <div class="form-group">
+            <label>ENVOYER À</label>
+            <input type="text" id="forward-search" placeholder="Rechercher une conversation...">
+          </div>
+          <div id="forward-conversations" class="forward-conversations"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content settings-modal-redesign">
+        <div class="settings-sidebar">
+          <div class="settings-nav">
+            <div class="settings-nav-section">MON COMPTE</div>
+            <div class="settings-nav-item active" data-section="profile">Profil</div>
+            <div class="settings-nav-item" data-section="account">Compte</div>
+            <div class="settings-nav-section">PARAMÈTRES</div>
+            <div class="settings-nav-item" data-section="appearance">Apparence</div>
+            <div class="settings-nav-item" data-section="privacy">Confidentialité</div>
+          </div>
+          <div class="settings-logout">
+            <button class="logout-btn" onclick="logout()">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor"
+                  d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+              </svg>
+              Déconnexion
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-main">
+          <div class="settings-header">
+            <h2>Mon Profil</h2>
+            <button class="close-modal" id="close-settings">&times;</button>
+          </div>
+
+          <div class="settings-content-grid">
+            <!-- Left: Edit Form -->
+            <div class="settings-form-section">
+              <!-- Banner & Avatar -->
+              <div class="profile-banner-edit">
+                <div class="banner-preview" id="settings-banner">
+                  <button class="banner-change-btn" id="change-banner-btn">
+                    <i class="fas fa-camera"></i>
+                    Changer la bannière
+                  </button>
+                </div>
+                <input type="file" id="banner-input" hidden accept="image/*">
+
+                <div class="avatar-edit-section">
+                  <div class="avatar-preview" id="settings-avatar">?</div>
+                  <button class="avatar-change-btn" id="change-avatar-btn">
+                    <i class="fas fa-camera"></i>
+                  </button>
+                  <input type="file" id="avatar-input" hidden accept="image/*">
+                </div>
+              </div>
+
+              <!-- Form Fields -->
+              <div class="profile-form">
+                <div class="form-group-modern">
+                  <label>NOM D'AFFICHAGE</label>
+                  <input type="text" id="settings-username" placeholder="Ton pseudo">
+                </div>
+
+                <div class="form-group-modern">
+                  <label>PRONOMS</label>
+                  <input type="text" id="settings-pronouns" placeholder="Ajoute tes pronoms">
+                </div>
+
+                <div class="form-group-modern">
+                  <label>BIO</label>
+                  <textarea id="settings-bio" placeholder="Parle-nous de toi..." rows="3" maxlength="190"></textarea>
+                  <span class="char-count"><span id="bio-count">0</span>/190</span>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-group-modern status-group">
+                  <label>STATUT</label>
+                  <div class="status-input-combined">
+                    <input type="text" id="settings-custom-status-emoji" placeholder="😊" maxlength="2"
+                      class="emoji-input">
+                    <input type="text" id="settings-custom-status" placeholder="Définir un statut personnalisé">
+                  </div>
+                </div>
+
+                <div class="form-group-modern">
+                  <label>STATUT DE PRÉSENCE</label>
+                  <div class="presence-options">
+                    <label class="presence-option">
+                      <input type="radio" name="presence" value="online" checked>
+                      <span class="status-dot online"></span>
+                      En ligne
+                    </label>
+                    <label class="presence-option">
+                      <input type="radio" name="presence" value="idle">
+                      <span class="status-dot idle"></span>
+                      Absent
+                    </label>
+                    <label class="presence-option">
+                      <input type="radio" name="presence" value="dnd">
+                      <span class="status-dot dnd"></span>
+                      Ne pas déranger
+                    </label>
+                    <label class="presence-option">
+                      <input type="radio" name="presence" value="invisible">
+                      <span class="status-dot offline"></span>
+                      Invisible
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-group-modern">
+                  <label>LIENS SOCIAUX</label>
+                  <div class="social-links-modern">
+                    <div class="social-link-row">
+                      <div class="social-icon spotify"><i class="fab fa-spotify"></i></div>
+                      <input type="text" id="social-spotify" placeholder="Nom d'utilisateur Spotify">
+                    </div>
+                    <div class="social-link-row">
+                      <div class="social-icon steam"><i class="fab fa-steam"></i></div>
+                      <input type="text" id="social-steam" placeholder="Profil Steam">
+                    </div>
+                    <div class="social-link-row">
+                      <div class="social-icon twitch"><i class="fab fa-twitch"></i></div>
+                      <input type="text" id="social-twitch" placeholder="Chaîne Twitch">
+                    </div>
+                    <div class="social-link-row">
+                      <div class="social-icon github"><i class="fab fa-github"></i></div>
+                      <input type="text" id="social-github" placeholder="Profil GitHub">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Preview Card -->
+            <div class="profile-preview-section">
+              <label class="preview-label">APERÇU</label>
+              <div class="profile-card-preview">
+                <div class="preview-banner" id="preview-banner"></div>
+                <div class="preview-avatar-container">
+                  <div class="preview-avatar" id="preview-avatar">?</div>
+                  <span class="preview-status-dot online" id="preview-status-dot"></span>
+                </div>
+                <div class="preview-info">
+                  <h3 id="preview-username">Username</h3>
+                  <p class="preview-custom-status" id="preview-custom-status"></p>
+                  <div class="preview-divider"></div>
+                  <div class="preview-section">
+                    <h4>À PROPOS DE MOI</h4>
+                    <p id="preview-bio">Aucune bio</p>
+                  </div>
+                  <div class="preview-socials" id="preview-socials"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-footer">
+            <button class="btn-link" id="cancel-settings">Annuler</button>
+            <button class="btn-primary-modern" id="save-settings">Enregistrer les modifications</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Menu (for message actions) -->
+    <div id="context-menu" class="context-menu hidden">
+      <div class="context-menu-item" id="ctx-reply">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path fill="currentColor" d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
+        </svg>
+        Répondre
+      </div>
+      <div class="context-menu-item" id="ctx-forward">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path fill="currentColor" d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" />
+        </svg>
+        Transférer
+      </div>
+      <svg viewBox="0 0 24 24" width="16" height="16">
+        <path fill="currentColor"
+          d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+      </svg>
+      Copier
+    </div>
+  </div>
+
+  <!-- Create Server Modal -->
+  <div id="create-server-modal" class="modal hidden">
+    <div class="modal-content create-server-modal">
+      <div class="modal-header">
+        <h3>Créer un serveur</h3>
+        <button class="close-modal" onclick="closeAllModals()">&times;</button>
+      </div>
+      <div class="create-server-content">
+        <div class="form-group">
+          <label>NOM DU SERVEUR</label>
+          <input type="text" id="new-server-name" placeholder="Mon super serveur">
+        </div>
+        <div class="server-icon-preview">
+          <div class="preview-icon" id="server-icon-preview">S</div>
+          <button class="btn-secondary" id="upload-server-icon">Uploader une icône</button>
+          <input type="file" id="server-icon-input" hidden accept="image/*">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeAllModals()">Annuler</button>
+        <button class="btn-primary" id="confirm-create-server">Créer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Server Modal -->
+  <div id="join-server-modal" class="modal hidden">
+    <div class="modal-content join-server-modal">
+      <div class="modal-header">
+        <h3>Rejoindre un serveur</h3>
+        <button class="close-modal" onclick="closeAllModals()">&times;</button>
+      </div>
+      <div class="join-server-content">
+        <div class="form-group">
+          <label>LIEN D'INVITATION OU CODE</label>
+          <input type="text" id="invite-code-input" placeholder="https://discord.gg/abc123 ou abc123">
+        </div>
+        <p class="invite-hint">Les liens d'invitation ressemblent à : discord.gg/abc123</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeAllModals()">Annuler</button>
+        <button class="btn-primary" id="confirm-join-server">Rejoindre</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Server Options Modal -->
+  <div id="add-server-options-modal" class="modal hidden">
+    <div class="modal-content add-server-options-modal">
+      <div class="modal-header">
+        <h3>Ajouter un serveur</h3>
+        <button class="close-modal" onclick="closeAllModals()">&times;</button>
+      </div>
+      <div class="add-server-options">
+        <button class="server-option" onclick="showCreateServerModal()">
+          <div class="option-icon">🏠</div>
+          <div class="option-text">
+            <strong>Créer le mien</strong>
+            <span>Créer un nouveau serveur et commencer à inviter des amis</span>
+          </div>
+        </button>
+        <button class="server-option" onclick="showJoinServerModal()">
+          <div class="option-icon">🔗</div>
+          <div class="option-text">
+            <strong>Rejoindre un serveur</strong>
+            <span>Entrer un code d'invitation et rejoindre un serveur existant</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice Channel UI -->
+  <div id="voice-channel-ui" class="voice-channel-ui hidden">
+    <div class="voice-channel-header">
+      <div class="voice-info">
+        <span class="voice-connected">🔊 Vocal connecté</span>
+        <span class="voice-channel-name" id="current-voice-channel-name"></span>
+      </div>
+      <button class="icon-btn" id="voice-disconnect-btn" onclick="VoiceModule.leaveChannel()" title="Déconnecter">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path fill="currentColor"
+            d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z" />
+        </svg>
+      </button>
+    </div>
+    <div class="voice-controls">
+      <button class="voice-control-btn" id="voice-mute-btn" onclick="VoiceModule.toggleMute()" title="Mute">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <button class="voice-control-btn" id="voice-deafen-btn" onclick="VoiceModule.toggleDeafen()" title="Sourdine">
+        <i class="fas fa-headphones"></i>
+      </button>
+      <button class="voice-control-btn" id="voice-video-btn" onclick="VoiceModule.toggleVideo()" title="Vidéo">
+        <i class="fas fa-video"></i>
+      </button>
+      <button class="voice-control-btn" id="voice-screen-btn" onclick="VoiceModule.startScreenShare()"
+        title="Partage d'écran">
+        <i class="fas fa-desktop"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Voice Participants Grid (for video calls) -->
+  <div id="voice-participants-modal" class="modal hidden">
+    <div class="voice-participants-container">
+      <div class="voice-participants-header">
+        <h3 id="voice-modal-channel-name">Salon Vocal</h3>
+        <button class="close-modal"
+          onclick="document.getElementById('voice-participants-modal').classList.add('hidden')">&times;</button>
+      </div>
+      <div id="voice-participants-grid" class="voice-participants-grid">
+        <!-- Participants will be rendered here -->
+      </div>
+      <div class="voice-fullscreen-controls">
+        <button class="voice-control-btn large" id="voice-mute-btn-full" onclick="VoiceModule.toggleMute()">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button class="voice-control-btn large" id="voice-deafen-btn-full" onclick="VoiceModule.toggleDeafen()">
+          <i class="fas fa-headphones"></i>
+        </button>
+        <button class="voice-control-btn large" id="voice-video-btn-full" onclick="VoiceModule.toggleVideo()">
+          <i class="fas fa-video"></i>
+        </button>
+        <button class="voice-control-btn large" id="voice-screen-btn-full" onclick="VoiceModule.startScreenShare()">
+          <i class="fas fa-desktop"></i>
+        </button>
+        <button class="voice-control-btn large disconnect" onclick="VoiceModule.leaveChannel()">
+          <i class="fas fa-phone-slash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Voice Channel Modal -->
+  <div id="join-voice-modal" class="modal hidden">
+    <div class="modal-content join-voice-modal">
+      <div class="modal-header">
+        <h3>Rejoindre le salon vocal</h3>
+        <button class="close-modal" onclick="closeAllModals()">&times;</button>
+      </div>
+      <div class="join-voice-content">
+        <p>Voulez-vous rejoindre <strong id="join-voice-channel-name"></strong> ?</p>
+        <div class="join-voice-options">
+          <label>
+            <input type="checkbox" id="join-with-video"> Activer la vidéo
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeAllModals()">Annuler</button>
+        <button class="btn-primary" id="confirm-join-voice">Rejoindre</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Switcher Modal (Ctrl+K) -->
+  <div id="quick-switcher-modal" class="modal hidden">
+    <div class="modal-content quick-switcher-modal">
+      <div class="quick-switcher-input-wrapper">
+        <input type="text" id="quick-switcher-input" placeholder="Où désires-tu aller ?">
+      </div>
+      <div class="quick-switcher-results">
+        <div class="quick-switcher-section" id="qs-recent-section">
+          <div class="qs-section-header">SALONS PRÉCÉDENTS</div>
+          <div id="qs-recent-list" class="qs-list"></div>
+        </div>
+        <div class="quick-switcher-section" id="qs-servers-section">
+          <div class="qs-section-header">SERVEURS</div>
+          <div id="qs-servers-list" class="qs-list"></div>
+        </div>
+        <div class="quick-switcher-section" id="qs-dms-section">
+          <div class="qs-section-header">MESSAGES PRIVÉS</div>
+          <div id="qs-dms-list" class="qs-list"></div>
+        </div>
+      </div>
+      <div class="quick-switcher-tip">
+        <span class="tip-label">CONSEIL DE PRO:</span> Commencer les recherches avec <code>@</code> <code>#</code>
+        <code>!</code> <code>*</code> pour affiner les résultats.
+      </div>
+    </div>
+  </div>
+
+  <!-- Server View (Main area when server is selected) -->
+  <main class="chat-area server-chat-area hidden" id="server-view">
+    <div id="server-channel-view" class="server-channel-view">
+      <header class="chat-header">
+        <div class="chat-header-info">
+          <span class="channel-hash">#</span>
+          <span class="chat-username" id="server-channel-name">général</span>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" title="Créer une invitation" onclick="showInviteModal()">
+            <i class="fas fa-user-plus"></i>
+          </button>
+          <button class="icon-btn" title="Paramètres du salon">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="messages-container" id="channel-messages-container">
+        <div id="channel-messages" class="messages-list">
+          <!-- Channel messages will be loaded here -->
+        </div>
+      </div>
+
+      <div class="message-input-container">
+        <div class="message-input-wrapper">
+          <button class="icon-btn attach-btn" title="Joindre un fichier">
+            <i class="fas fa-plus-circle"></i>
+          </button>
+          <div class="message-input-inner">
+            <textarea id="channel-message-input" placeholder="Envoyer un message dans #général" rows="1"></textarea>
+          </div>
+          <button class="icon-btn emoji-btn" title="Emoji">
+            <i class="fas fa-smile"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Members List -->
+    <aside id="members-list" class="members-list">
+      <!-- Members will be loaded here -->
+    </aside>
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/calls.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/modules/servers.js"></script>
+  <script src="js/modules/voice.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    // Recent items for quick switcher
+    let recentChannels = JSON.parse(localStorage.getItem('recentChannels') || '[]');
+
+    // Quick Switcher functionality
+    function openQuickSwitcher() {
+      const modal = document.getElementById('quick-switcher-modal');
+      modal.classList.remove('hidden');
+      const input = document.getElementById('quick-switcher-input');
+      input.value = '';
+      input.focus();
+      renderQuickSwitcherResults('');
+    }
+
+    function closeQuickSwitcher() {
+      document.getElementById('quick-switcher-modal').classList.add('hidden');
+    }
+
+    function renderQuickSwitcherResults(query) {
+      const q = query.toLowerCase();
+
+      // Recent channels
+      const recentList = document.getElementById('qs-recent-list');
+      const filteredRecent = recentChannels.filter(c =>
+        !q || c.name.toLowerCase().includes(q)
+      ).slice(0, 4);
+
+      recentList.innerHTML = filteredRecent.map(channel => `
+        <div class="qs-item" onclick="quickSwitchTo('${channel.type}', '${channel.id}', '${channel.serverId || ''}')">
+          <div class="qs-item-icon">
+            ${channel.type === 'dm' ?
+          `<img src="${channel.avatar || '/default-avatar.png'}" alt="">` :
+          `<i class="fas fa-${channel.type === 'voice' ? 'volume-up' : 'hashtag'}"></i>`
+        }
+          </div>
+          <div class="qs-item-info">
+            <span class="qs-item-name">${channel.name}</span>
+            ${channel.serverName ? `<span class="qs-item-server">${channel.serverName}</span>` : ''}
+          </div>
+        </div>
+      `).join('') || '<div class="qs-empty">Aucun salon récent</div>';
+
+      // Servers
+      const serversList = document.getElementById('qs-servers-list');
+      if (typeof ServersModule !== 'undefined') {
+        const servers = ServersModule.getServers() || [];
+        const filteredServers = servers.filter(s => !q || s.name.toLowerCase().includes(q)).slice(0, 4);
+        serversList.innerHTML = filteredServers.map(server => `
+          <div class="qs-item" onclick="quickSwitchTo('server', '${server.id}')">
+            <div class="qs-item-icon server-icon-mini">
+              ${server.icon ?
+            `<img src="${server.icon}" alt="">` :
+            `<span>${server.name.charAt(0).toUpperCase()}</span>`
+          }
+            </div>
+            <div class="qs-item-info">
+              <span class="qs-item-name">${server.name}</span>
+            </div>
+          </div>
+        `).join('') || '<div class="qs-empty">Aucun serveur</div>';
+      }
+
+      // DMs
+      const dmsList = document.getElementById('qs-dms-list');
+      if (typeof conversations !== 'undefined') {
+        const filteredDMs = conversations.filter(c => {
+          const name = c.type === 'group' ? c.name : c.other_user?.username;
+          return !q || (name && name.toLowerCase().includes(q));
+        }).slice(0, 4);
+
+        dmsList.innerHTML = filteredDMs.map(conv => {
+          const name = conv.type === 'group' ? conv.name : conv.other_user?.username;
+          const avatar = conv.type === 'group' ? null : conv.other_user?.avatar;
+          return `
+            <div class="qs-item" onclick="quickSwitchTo('dm', '${conv.id}')">
+              <div class="qs-item-icon">
+                ${avatar ?
+              `<img src="${avatar}" alt="">` :
+              `<span>${(name || 'U').charAt(0).toUpperCase()}</span>`
+            }
+              </div>
+              <div class="qs-item-info">
+                <span class="qs-item-name">${name || 'Conversation'}</span>
+              </div>
+            </div>
+          `;
+        }).join('') || '<div class="qs-empty">Aucune conversation</div>';
+      }
+    }
+
+    function quickSwitchTo(type, id, serverId) {
+      closeQuickSwitcher();
+
+      if (type === 'server') {
+        ServersModule?.selectServer(id);
+      } else if (type === 'dm') {
+        selectConversation(id);
+      } else if (type === 'text' || type === 'voice') {
+        if (serverId) {
+          ServersModule?.selectServer(serverId).then(() => {
+            ServersModule?.selectChannel(id);
+          });
+        }
+      }
+    }
+
+    function addToRecentChannels(channel) {
+      recentChannels = recentChannels.filter(c => c.id !== channel.id);
+      recentChannels.unshift(channel);
+      recentChannels = recentChannels.slice(0, 8);
+      localStorage.setItem('recentChannels', JSON.stringify(recentChannels));
+    }
+
+    // Server icon upload
+    function handleServerIconUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('server-icon-preview').innerHTML =
+          `<img src="${e.target.result}" alt="">`;
+        document.getElementById('server-icon-preview').dataset.iconData = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Show/hide sidebars when switching between DMs and servers
+    function showServerView(server) {
+      document.getElementById('conversations-sidebar')?.classList.add('hidden');
+      document.getElementById('server-sidebar')?.classList.remove('hidden');
+      document.getElementById('dm-view')?.classList.add('hidden');
+      document.getElementById('server-view')?.classList.remove('hidden');
+
+      document.getElementById('server-name').textContent = server.name;
+      document.getElementById('current-username-server').textContent = currentUser?.username || 'User';
+    }
+
+    function showDMView() {
+      document.getElementById('server-sidebar')?.classList.add('hidden');
+      document.getElementById('conversations-sidebar')?.classList.remove('hidden');
+      document.getElementById('server-view')?.classList.add('hidden');
+      document.getElementById('dm-view')?.classList.remove('hidden');
+
+      document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
+      document.getElementById('home-btn')?.classList.add('active');
+    }
+
+    function showInviteModal() {
+      // Generate invite code
+      const server = ServersModule?.getCurrentServer();
+      if (server) {
+        ServersModule.createInvite().then(code => {
+          if (code) {
+            const inviteUrl = `${window.location.origin}/invite/${code}`;
+            navigator.clipboard.writeText(inviteUrl);
+            showToast('Lien d\'invitation copié !', 'success');
+          }
+        });
+      }
+    }
+
+    function toggleServerMenu() {
+      // TODO: Show server dropdown menu
+    }
+
+    // Initialize modules after app loads
+    document.addEventListener('DOMContentLoaded', () => {
+      // Quick Switcher keyboard shortcut
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          openQuickSwitcher();
+        }
+        if (e.key === 'Escape') {
+          closeQuickSwitcher();
+        }
+      });
+
+      // Quick Switcher input
+      document.getElementById('quick-switcher-input')?.addEventListener('input', (e) => {
+        renderQuickSwitcherResults(e.target.value);
+      });
+
+      // Click overlay to close
+      document.getElementById('quick-switcher-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'quick-switcher-modal') {
+          closeQuickSwitcher();
+        }
+      });
+
+      // Search box click opens Quick Switcher
+      document.getElementById('user-search')?.addEventListener('focus', (e) => {
+        e.target.blur();
+        openQuickSwitcher();
+      });
+
+      // Server creation modal handlers
+      document.getElementById('add-server-btn')?.addEventListener('click', () => {
+        document.getElementById('add-server-options-modal').classList.remove('hidden');
+      });
+
+      // Server icon upload
+      document.getElementById('upload-server-icon')?.addEventListener('click', () => {
+        document.getElementById('server-icon-input').click();
+      });
+      document.getElementById('server-icon-input')?.addEventListener('change', (e) => {
+        handleServerIconUpload(e.target);
+      });
+
+      // Update server icon preview when name changes
+      document.getElementById('new-server-name')?.addEventListener('input', (e) => {
+        const preview = document.getElementById('server-icon-preview');
+        if (!preview.dataset.iconData) {
+          preview.innerHTML = `<span>${(e.target.value || 'S').charAt(0).toUpperCase()}</span>`;
+        }
+      });
+
+      document.getElementById('confirm-create-server')?.addEventListener('click', async () => {
+        const name = document.getElementById('new-server-name').value;
+        const iconPreview = document.getElementById('server-icon-preview');
+        const icon = iconPreview?.dataset?.iconData || null;
+
+        if (name) {
+          await ServersModule.createServer(name, icon);
+          closeAllModals();
+          document.getElementById('new-server-name').value = '';
+          if (iconPreview) {
+            iconPreview.innerHTML = `<span>S</span>`;
+            delete iconPreview.dataset.iconData;
+          }
+        }
+      });
+
+      document.getElementById('confirm-join-server')?.addEventListener('click', async () => {
+        const code = document.getElementById('invite-code-input').value;
+        if (code) {
+          const match = code.match(/(?:discord\.gg\/|\/invite\/)?([a-zA-Z0-9]+)$/);
+          const inviteCode = match ? match[1] : code;
+          await ServersModule.joinServer(inviteCode);
+          closeAllModals();
+        }
+      });
+
+      document.getElementById('confirm-join-voice')?.addEventListener('click', () => {
+        const modal = document.getElementById('join-voice-modal');
+        const channelId = modal.dataset.channelId;
+        const withVideo = document.getElementById('join-with-video').checked;
+        VoiceModule.joinChannel(channelId, withVideo);
+        closeAllModals();
+      });
+
+      // Channel message input
+      document.getElementById('channel-message-input')?.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const content = e.target.value.trim();
+          if (content) {
+            await ServersModule.sendChannelMessage(content);
+            e.target.value = '';
+          }
+        }
+      });
+    });
+
+    function showCreateServerModal() {
+      closeAllModals();
+      document.getElementById('create-server-modal').classList.remove('hidden');
+    }
+
+    function showJoinServerModal() {
+      closeAllModals();
+      document.getElementById('join-server-modal').classList.remove('hidden');
+    }
+  </script>
+</body>
+
+</html>

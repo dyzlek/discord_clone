@@ -2013,6 +2013,22 @@ textarea#message-input:focus {
     z-index: 2;
 }
 
+.preview-status-dot.online {
+    background-color: var(--status-online);
+}
+
+.preview-status-dot.idle {
+    background-color: var(--status-idle);
+}
+
+.preview-status-dot.dnd {
+    background-color: var(--status-dnd);
+}
+
+.preview-status-dot.offline {
+    background-color: var(--status-offline);
+}
+
 .preview-info {
     padding: 8px 16px 16px;
     margin-top: 4px;

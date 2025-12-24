@@ -138,93 +138,132 @@ function setupEventListeners() {
     document.getElementById('close-image-viewer')?.addEventListener('click', () => {
         document.getElementById('image-viewer-modal').classList.add('hidden');
     });
-    document.getElementById('image-viewer-modal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'image-viewer-modal') {
-            e.target.classList.add('hidden');
-        }
+    if (e.target.id === 'image-viewer-modal') {
+        e.target.classList.add('hidden');
+    }
+});
+
+// Close modals on escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllModals();
+    }
+    // Ctrl+F for message search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f' && currentConversation) {
+        e.preventDefault();
+        openMessageSearch();
+    }
+});
+
+// Voice Recording
+document.getElementById('voice-btn')?.addEventListener('click', startVoiceRecording);
+document.getElementById('cancel-voice')?.addEventListener('click', cancelVoiceRecording);
+document.getElementById('send-voice')?.addEventListener('click', sendVoiceMessage);
+
+// Call buttons
+document.getElementById('video-call-btn')?.addEventListener('click', () => initiateCall('video'));
+document.getElementById('audio-call-btn')?.addEventListener('click', () => initiateCall('audio'));
+document.getElementById('reject-call')?.addEventListener('click', rejectIncomingCall);
+document.getElementById('accept-call')?.addEventListener('click', acceptIncomingCall);
+document.getElementById('toggle-mute')?.addEventListener('click', toggleMuteAudio);
+document.getElementById('toggle-video')?.addEventListener('click', toggleVideoStream);
+document.getElementById('end-call')?.addEventListener('click', endCurrentCall);
+
+// Settings
+document.getElementById('user-settings')?.addEventListener('click', openSettings);
+document.getElementById('close-settings')?.addEventListener('click', closeSettingsModal);
+document.getElementById('cancel-settings')?.addEventListener('click', closeSettingsModal);
+document.getElementById('save-settings')?.addEventListener('click', saveUserSettings);
+document.getElementById('change-avatar-btn')?.addEventListener('click', () => document.getElementById('avatar-input').click());
+document.getElementById('avatar-input')?.addEventListener('change', handleAvatarSelect);
+document.getElementById('change-banner-btn')?.addEventListener('click', () => document.getElementById('banner-input').click());
+document.getElementById('banner-input')?.addEventListener('change', handleBannerSelect);
+
+// Friends panel
+document.getElementById('nav-friends')?.addEventListener('click', showFriendsPanel);
+document.querySelectorAll('.friends-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchFriendsTab(tab.dataset.tab));
+});
+document.getElementById('send-friend-request')?.addEventListener('click', sendFriendRequest);
+document.getElementById('generate-friend-link')?.addEventListener('click', generateFriendLink);
+document.getElementById('copy-friend-link')?.addEventListener('click', copyFriendLink);
+
+// Group creation
+document.getElementById('create-group-btn')?.addEventListener('click', openCreateGroupModal);
+document.getElementById('close-group-modal')?.addEventListener('click', closeCreateGroupModal);
+document.getElementById('cancel-group')?.addEventListener('click', closeCreateGroupModal);
+document.getElementById('confirm-group')?.addEventListener('click', createGroup);
+document.getElementById('group-members-search')?.addEventListener('input', searchGroupMembers);
+
+// Message search
+document.getElementById('search-messages-btn')?.addEventListener('click', openMessageSearch);
+document.getElementById('close-message-search')?.addEventListener('click', closeMessageSearch);
+document.getElementById('message-search-input')?.addEventListener('input', debounce(searchMessages, 300));
+
+// Reply
+document.getElementById('cancel-reply')?.addEventListener('click', cancelReply);
+
+// Forward modal
+document.getElementById('close-forward-modal')?.addEventListener('click', closeForwardModal);
+document.getElementById('forward-search')?.addEventListener('input', filterForwardConversations);
+
+// Context menu
+document.addEventListener('click', () => hideContextMenu());
+document.getElementById('ctx-reply')?.addEventListener('click', () => {
+    if (window.contextMenuMessageId) startReply(window.contextMenuMessageId);
+    hideContextMenu();
+});
+document.getElementById('ctx-forward')?.addEventListener('click', () => {
+    if (window.contextMenuMessageId) openForwardModal(window.contextMenuMessageId);
+    hideContextMenu();
+});
+document.getElementById('ctx-copy')?.addEventListener('click', () => {
+    if (window.contextMenuContent) {
+        navigator.clipboard.writeText(window.contextMenuContent);
+    }
+    hideContextMenu();
+});
+
+setupProfilePreviewListeners();
+}
+
+function setupProfilePreviewListeners() {
+    // Username
+    document.getElementById('settings-username')?.addEventListener('input', (e) => {
+        const val = e.target.value.trim() || 'Username';
+        document.getElementById('preview-username').textContent = val;
     });
 
-    // Close modals on escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeAllModals();
-        }
-        // Ctrl+F for message search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f' && currentConversation) {
-            e.preventDefault();
-            openMessageSearch();
-        }
+    // Bio
+    document.getElementById('settings-bio')?.addEventListener('input', (e) => {
+        const val = e.target.value;
+        const preview = document.getElementById('preview-bio');
+        if (preview) preview.textContent = val || 'Aucune bio';
+        document.getElementById('bio-count').textContent = val.length;
     });
 
-    // Voice Recording
-    document.getElementById('voice-btn')?.addEventListener('click', startVoiceRecording);
-    document.getElementById('cancel-voice')?.addEventListener('click', cancelVoiceRecording);
-    document.getElementById('send-voice')?.addEventListener('click', sendVoiceMessage);
+    // Custom Status
+    const updateCustomStatus = () => {
+        const emoji = document.getElementById('settings-custom-status-emoji').value;
+        const text = document.getElementById('settings-custom-status').value;
+        const preview = document.getElementById('preview-custom-status');
+        if (preview) preview.textContent = (emoji + ' ' + text).trim();
+    };
+    document.getElementById('settings-custom-status')?.addEventListener('input', updateCustomStatus);
+    document.getElementById('settings-custom-status-emoji')?.addEventListener('input', updateCustomStatus);
 
-    // Call buttons
-    document.getElementById('video-call-btn')?.addEventListener('click', () => initiateCall('video'));
-    document.getElementById('audio-call-btn')?.addEventListener('click', () => initiateCall('audio'));
-    document.getElementById('reject-call')?.addEventListener('click', rejectIncomingCall);
-    document.getElementById('accept-call')?.addEventListener('click', acceptIncomingCall);
-    document.getElementById('toggle-mute')?.addEventListener('click', toggleMuteAudio);
-    document.getElementById('toggle-video')?.addEventListener('click', toggleVideoStream);
-    document.getElementById('end-call')?.addEventListener('click', endCurrentCall);
-
-    // Settings
-    document.getElementById('user-settings')?.addEventListener('click', openSettings);
-    document.getElementById('close-settings')?.addEventListener('click', closeSettingsModal);
-    document.getElementById('cancel-settings')?.addEventListener('click', closeSettingsModal);
-    document.getElementById('save-settings')?.addEventListener('click', saveUserSettings);
-    document.getElementById('change-avatar-btn')?.addEventListener('click', () => document.getElementById('avatar-input').click());
-    document.getElementById('avatar-input')?.addEventListener('change', handleAvatarSelect);
-    document.getElementById('change-banner-btn')?.addEventListener('click', () => document.getElementById('banner-input').click());
-    document.getElementById('banner-input')?.addEventListener('change', handleBannerSelect);
-
-    // Friends panel
-    document.getElementById('nav-friends')?.addEventListener('click', showFriendsPanel);
-    document.querySelectorAll('.friends-tab').forEach(tab => {
-        tab.addEventListener('click', () => switchFriendsTab(tab.dataset.tab));
-    });
-    document.getElementById('send-friend-request')?.addEventListener('click', sendFriendRequest);
-    document.getElementById('generate-friend-link')?.addEventListener('click', generateFriendLink);
-    document.getElementById('copy-friend-link')?.addEventListener('click', copyFriendLink);
-
-    // Group creation
-    document.getElementById('create-group-btn')?.addEventListener('click', openCreateGroupModal);
-    document.getElementById('close-group-modal')?.addEventListener('click', closeCreateGroupModal);
-    document.getElementById('cancel-group')?.addEventListener('click', closeCreateGroupModal);
-    document.getElementById('confirm-group')?.addEventListener('click', createGroup);
-    document.getElementById('group-members-search')?.addEventListener('input', searchGroupMembers);
-
-    // Message search
-    document.getElementById('search-messages-btn')?.addEventListener('click', openMessageSearch);
-    document.getElementById('close-message-search')?.addEventListener('click', closeMessageSearch);
-    document.getElementById('message-search-input')?.addEventListener('input', debounce(searchMessages, 300));
-
-    // Reply
-    document.getElementById('cancel-reply')?.addEventListener('click', cancelReply);
-
-    // Forward modal
-    document.getElementById('close-forward-modal')?.addEventListener('click', closeForwardModal);
-    document.getElementById('forward-search')?.addEventListener('input', filterForwardConversations);
-
-    // Context menu
-    document.addEventListener('click', () => hideContextMenu());
-    document.getElementById('ctx-reply')?.addEventListener('click', () => {
-        if (window.contextMenuMessageId) startReply(window.contextMenuMessageId);
-        hideContextMenu();
-    });
-    document.getElementById('ctx-forward')?.addEventListener('click', () => {
-        if (window.contextMenuMessageId) openForwardModal(window.contextMenuMessageId);
-        hideContextMenu();
-    });
-    document.getElementById('ctx-copy')?.addEventListener('click', () => {
-        if (window.contextMenuContent) {
-            navigator.clipboard.writeText(window.contextMenuContent);
-        }
-        hideContextMenu();
+    // Presence
+    document.querySelectorAll('input[name="presence"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const dot = document.getElementById('preview-status-dot');
+            if (dot) {
+                dot.className = 'preview-status-dot ' + e.target.value; // e.target.value is online, idle, etc.
+                if (e.target.value === 'invisible') dot.className = 'preview-status-dot offline';
+            }
+        });
     });
 }
+
 
 function closeAllModals() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
@@ -1347,11 +1386,16 @@ function openSettings() {
     const previewBio = document.getElementById('preview-bio');
     if (previewBio) previewBio.textContent = currentUser.bio || 'Aucune bio';
 
-    const previewCustomStatus = document.getElementById('preview-custom-status');
     if (previewCustomStatus) {
         const emoji = currentUser.custom_status_emoji || '';
         const status = currentUser.custom_status || '';
         previewCustomStatus.textContent = emoji + ' ' + status;
+    }
+
+    const previewStatusDot = document.getElementById('preview-status-dot');
+    if (previewStatusDot) {
+        const p = currentUser.presence || 'online';
+        previewStatusDot.className = 'preview-status-dot ' + (p === 'invisible' ? 'offline' : p);
     }
 
     // Update bio character count
@@ -1369,7 +1413,11 @@ function handleAvatarSelect(e) {
     if (file.size > 5 * 1024 * 1024) { showToast('Image trop grande (max 5MB)', 'error'); return; }
     pendingAvatarFile = file;
     const reader = new FileReader();
-    reader.onload = (ev) => { document.getElementById('settings-avatar').innerHTML = `<img src="${ev.target.result}">`; };
+    reader.onload = (ev) => {
+        const content = `<img src="${ev.target.result}">`;
+        document.getElementById('settings-avatar').innerHTML = content;
+        document.getElementById('preview-avatar').innerHTML = content;
+    };
     reader.readAsDataURL(file);
 }
 
@@ -1379,7 +1427,11 @@ function handleBannerSelect(e) {
     if (file.size > 10 * 1024 * 1024) { showToast('Image trop grande (max 10MB)', 'error'); return; }
     pendingBannerFile = file;
     const reader = new FileReader();
-    reader.onload = (ev) => { document.getElementById('settings-banner').style.backgroundImage = `url(${ev.target.result})`; };
+    reader.onload = (ev) => {
+        const style = `url(${ev.target.result})`;
+        document.getElementById('settings-banner').style.backgroundImage = style;
+        document.getElementById('preview-banner').style.backgroundImage = style;
+    };
     reader.readAsDataURL(file);
 }
 
